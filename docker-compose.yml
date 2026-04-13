@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # --- SERVICIO WEB (LARAVEL) ---
+  app:
+    # Usamos un nombre de contenedor ÚNICO para que no choque con otros contenedores
+    container_name: librvm_web_safe
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: librvm_imagen
+    restart: unless-stopped
+    ports:
+      - "8090:80"  # <--- OJO: Usamos el puerto 8090. Entrarás por http://localhost:8090
+    volumes:
+      - ./src:/var/www/html
+    networks:
+      - librvm_network
+    depends_on:
+      - db
+
+  # --- SERVICIO BASE DE DATOS ---
+  db:
+    image: mariadb:10.6
+    # Nombre único para que no choque con la BD de otros proyectos
+    container_name: librvm_db_safe
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: gestor_librvm
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: usuario
+      MYSQL_PASSWORD: password
+    ports:
+      - "3309:3306" # <--- OJO: Usamos el 3309 externo.
+    volumes:
+      - librvm_db_data:/var/lib/mysql # <--- Volumen con nombre exclusivo
+    networks:
+      - librvm_network
+
+  # --- PHPMYADMIN
+  pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: librvm_pma_safe
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8091:80" # <--- OJO: Usamos el 8091.
+    depends_on:
+      - db
+    networks:
+      - librvm_network
+
+# Definimos volúmenes y redes con nombres únicos
+volumes:
+  librvm_db_data: 
+
+networks:
+  librvm_network:
+    driver: bridge
