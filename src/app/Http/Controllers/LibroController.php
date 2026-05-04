@@ -30,7 +30,7 @@ class LibroController extends Controller
         ]);
 
         // Guardamos el libro en una variable para usar sus datos en el log
-        $libro = Libro::create($request->all());
+        $libro = Libro::create($request->validated());
 
         // --- REGISTRO MOVIMIENTO ---
         Movimiento::create([
@@ -56,7 +56,7 @@ class LibroController extends Controller
             'stock' => 'required|integer|min:0'
         ]);
 
-        $libro->update($request->all());
+        $libro->update($request->validated());
 
         // --- REGISTRO MOVIMIENTO ---
         Movimiento::create([

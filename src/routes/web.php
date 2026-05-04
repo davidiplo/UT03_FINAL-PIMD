@@ -7,11 +7,13 @@ use App\Http\Controllers\PrestamoController;
 use App\Http\Controllers\MorosoController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CatalogoController;
 
-// Página de bienvenida (puedes dejar la de Breeze o redirigir al login)
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+// ─── RUTAS PÚBLICAS (sin autenticación) ───────────────────────────────────────
+// Catálogo público: página de inicio accesible para cualquier visitante.
+// Soporta búsqueda asíncrona (AJAX/fetch) devolviendo JSON cuando procede.
+Route::get('/', [CatalogoController::class, 'index'])->name('catalogo.index');
+Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.buscar');
 
 // GRUPO PROTEGIDO: Solo usuarios logueados pueden entrar aquí
 Route::middleware(['auth'])->group(function () {
